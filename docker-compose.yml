@@ -12,6 +12,7 @@ services:
    - "postgres"
   volumes:
    - "./data/minetest:/data"
+   - "./data/minetest.conf:/data/minetest.conf"
   command: minetestserver --config /data/minetest.conf --world /data/world/ --quiet
   working_dir: /data
   logging:
@@ -100,26 +101,6 @@ services:
   image: registry.rudin.io/x86/minetest-serverstats-exporter
   restart: always
 
- node-exporter:
-  image: prom/node-exporter
-  restart: always
-  user: root
-  privileged: true
-  volumes:
-   - /proc:/host/proc:ro
-   - /sys:/host/sys:ro
-   - /:/rootfs:ro
-  command:
-   - '--path.procfs=/host/proc'
-   - '--path.sysfs=/host/sys'
-   - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-  networks:
-   - monitor-net
-   - default
-  logging:
-   options:
-    max-size: 50m
-
  postgres-exporter:
   image: wrouesnel/postgres_exporter
   restart: always
@@ -148,7 +129,6 @@ services:
    - ./data/prometheus.yml:/etc/prometheus/prometheus.yml
    - ./data/prometheus:/prometheus/data
   depends_on:
-   - "node-exporter"
    - "minetest-exporter"
   command:
    - '-config.file=/etc/prometheus/prometheus.yml'
