@@ -151,7 +151,5 @@ services:
 networks:
  terminator:
   external: true
- monitor-net:
-  driver: bridge
 
  
