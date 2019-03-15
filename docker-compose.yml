@@ -19,18 +19,18 @@ services:
    options:
     max-size: 50m
 
- tileserver:
-  image: registry.rudin.io/x86/minetest-tileserver
+ mapserver:
+  image: registry.rudin.io/x86/mapserver
   restart: always
+  ports:
+   - "8080:8080"
   networks:
    - default
   depends_on:
    - "postgres"
-   - "postgres-tiles"
   volumes:
-   - "./data/tileserver.properties:/tileserver.properties"
-   - "./data/tileserver.layers.json:/layers.json"
-   - "./data/tiles:/tiles"
+   - "./data/minetest/world:/minetest"
+  working_dir: "/minetest"
   logging:
    options:
     max-size: 50m
@@ -56,15 +56,6 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     - /opt/portainer/data:/data
 
- postgres-tiles:
-  image: postgres
-  restart: always
-  shm_size: '2gb'
-  environment:
-   POSTGRES_PASSWORD: enter
-  volumes:
-   - "./data/postgres-tiles:/var/lib/postgresql/data"
-
  nginx:
   image: nginx
   networks:
@@ -74,7 +65,6 @@ services:
   depends_on:
    - highscore
    - grafana
-   - tileserver
    - portainer
   environment:
    VIRTUAL_PORT: 80
@@ -121,17 +111,6 @@ services:
    - "postgres"
   environment:
    DATA_SOURCE_NAME: postgresql://postgres:enter@postgres:5432/?sslmode=disable
-  logging:
-   options:
-    max-size: 50m
-
- postgres-tiles-exporter:
-  image: wrouesnel/postgres_exporter
-  restart: always
-  depends_on:
-   - "postgres-tiles"
-  environment:
-   DATA_SOURCE_NAME: postgresql://postgres-tiles:enter@postgres:5432/?sslmode=disable
   logging:
    options:
     max-size: 50m
