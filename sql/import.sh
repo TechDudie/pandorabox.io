@@ -1,2 +1,2 @@
 #!/bin/sh
-cat changecount_column.sql | sudo docker-compose exec postgres psql -U postgres
+cat changecount_column.sql | sudo docker exec testpandoraboxio_postgres_1 psql -U postgres
